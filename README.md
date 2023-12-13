@@ -31,7 +31,6 @@
 3. ![jenkins](/img/3.png)
 4. ![jenkins](/img/4.png)
 5. ![jenkins](/img/5.png)
-<<<<<<< HEAD
 6. 
 =======
 
