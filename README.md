@@ -38,6 +38,31 @@
 
 1. ![jenkins](/img/21.PNG)
 2. ![jenkins](/img/22.PNG)
+3. Список команд
+sudo apt update && sudo apt upgrade -y
+
+#Добавляем репозиторий Zabbix
+wget https://repo.zabbix.com/zabbix/6.4/debian/pool/main/z/zabbix-release/zabbix-release_6.4-1+debian11_all.deb
+dpkg -i zabbix-release_6.4-1+debian11_all.deb
+apt update
+
+#Устанавливаем пакеты
+sudo apt install postgresql postgresql-contrib zabbix-server-pgsql zabbix-frontend-php php7.4-pgsql zabbix-apache-conf zabbix-sql-scripts zabbix-agent
+
+#Создаем пользователя, пароль, БД, задаем zabbix ее владельцем
+sudo -u postgres createuser --pwprompt zabbix
+sudo -u postgres createdb -O zabbix zabbix
+
+#Готовим схему БД и шаблон
+zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | sudo -u zabbix psql zabbix
+
+#Задаем пароль для соединения с СУБД 
+корректируем файл /etc/zabbix/zabbix_server.conf
+
+sudo systemctl restart zabbix-server zabbix-agent apache2
+sudo systemctl enable zabbix-server zabbix-agent apache2
+
+
 
 
 
@@ -58,7 +83,16 @@
 1. ![jenkins](/img/23.PNG)
 2. ![jenkins](/img/24.PNG)
 3. ![jenkins](/img/25.PNG)
- 
+4.  Список команд
+sudo apt update && sudo apt upgrade -y
+
+wget https://repo.zabbix.com/zabbix/6.4/debian/pool/main/z/zabbix-release/zabbix-release_6.4-1+debian11_all.deb
+
+sudo apt install zabbix-agent -y
+
+sudo nano /etc/zabbix/zabbix_agentd.conf
+
+sudo service zabbix-agent restart
 
 
 
