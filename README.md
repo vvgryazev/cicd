@@ -1,4 +1,4 @@
-# Домашнее задание к занятию "Система мониторинга Zabbix" - `Gryazev Vadim`
+# Домашнее задание к занятию "Система мониторинга Zabbix. Часть2" - `Gryazev Vadim`
 
 
 ### Инструкция по выполнению домашнего задания
@@ -24,45 +24,10 @@
 
 ### Задание 1
 
-Установите Zabbix Server с веб-интерфейсом.
-
-Процесс выполнения
-Выполняя ДЗ, сверяйтесь с процессом отражённым в записи лекции.
-Установите PostgreSQL. Для установки достаточна та версия, что есть в системном репозитороии Debian 11.
-Пользуясь конфигуратором команд с официального сайта, составьте набор команд для установки последней версии Zabbix с поддержкой PostgreSQL и Apache.
-Выполните все необходимые команды для установки Zabbix Server и Zabbix Web Server.
-Требования к результаты
-Прикрепите в файл README.md скриншот авторизации в админке.
-Приложите в файл README.md текст использованных команд в GitHub.
+Создайте свой шаблон, в котором будут элементы данных, мониторящие загрузку CPU и RAM хоста.
 
 
-1. ![jenkins](/img/21.PNG)
-2. ![jenkins](/img/22.PNG)
-3. Список команд
-sudo apt update && sudo apt upgrade -y
-
-#Добавляем репозиторий Zabbix
-wget https://repo.zabbix.com/zabbix/6.4/debian/pool/main/z/zabbix-release/zabbix-release_6.4-1+debian11_all.deb
-dpkg -i zabbix-release_6.4-1+debian11_all.deb
-apt update
-
-#Устанавливаем пакеты
-sudo apt install postgresql postgresql-contrib zabbix-server-pgsql zabbix-frontend-php php7.4-pgsql zabbix-apache-conf zabbix-sql-scripts zabbix-agent
-
-#Создаем пользователя, пароль, БД, задаем zabbix ее владельцем
-sudo -u postgres createuser --pwprompt zabbix
-sudo -u postgres createdb -O zabbix zabbix
-
-#Готовим схему БД и шаблон
-zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | sudo -u zabbix psql zabbix
-
-#Задаем пароль для соединения с СУБД 
-корректируем файл /etc/zabbix/zabbix_server.conf
-
-sudo systemctl restart zabbix-server zabbix-agent apache2
-sudo systemctl enable zabbix-server zabbix-agent apache2
-
-
+1. ![jenkins](/img/30.PNG)
 
 
 
@@ -71,54 +36,37 @@ sudo systemctl enable zabbix-server zabbix-agent apache2
 
 ### Задание 2
 
-Установите Zabbix Agent на два хоста.
+Добавьте в Zabbix два хоста
 
-Процесс выполнения
-Выполняя ДЗ, сверяйтесь с процессом отражённым в записи лекции.
-Установите Zabbix Agent на 2 вирт.машины, одной из них может быть ваш Zabbix Server.
-Добавьте Zabbix Server в список разрешенных серверов ваших Zabbix Agentов.
-Добавьте Zabbix Agentов в раздел Configuration > Hosts вашего Zabbix Servera.
-Проверьте, что в разделе Latest Data начали появляться данные с добавленных агентов.
-
-1. ![jenkins](/img/23.PNG)
-2. ![jenkins](/img/24.PNG)
-3. ![jenkins](/img/25.PNG)
-4.  Список команд
-sudo apt update && sudo apt upgrade -y
-
-wget https://repo.zabbix.com/zabbix/6.4/debian/pool/main/z/zabbix-release/zabbix-release_6.4-1+debian11_all.deb
-
-sudo apt install zabbix-agent -y
-
-sudo nano /etc/zabbix/zabbix_agentd.conf
-
-sudo service zabbix-agent restart
+1. ![jenkins](/img/31.PNG)
 
 
 
 ### Задание 3
+Привяжите созданный шаблон к двум хостам. Также привяжите к обоим хостам шаблон Linux by Zabbix Agent.
 
-`Приведите ответ в свободной форме........`
+Процесс выполнения
+Выполняя ДЗ сверяйтесь с процессом отражённым в записи лекции.
+Зайдите в настройки каждого хоста и в разделе Templates прикрепите к этому хосту ваш шаблон
+Так же к каждому хосту привяжите шаблон Linux by Zabbix Agent
+Проверьте что в раздел Latest Data начали поступать необходимые данные из вашего шаблона
+Требования к результату
+ Прикрепите в файл README.md скриншот страницы хостов, где будут видны привязки шаблонов с названиями «Задание 2-3». Хосты должны иметь зелёный статус подключения
 
-1. `Заполните здесь этапы выполнения, если требуется ....`
-2. `Заполните здесь этапы выполнения, если требуется ....`
-3. `Заполните здесь этапы выполнения, если требуется ....`
-4. `Заполните здесь этапы выполнения, если требуется ....`
-5. `Заполните здесь этапы выполнения, если требуется ....`
-6. 
+1. ![jenkins](/img/32.PNG)
 
-```
-Поле для вставки кода...
-....
-....
-....
-....
-```
 
-`При необходимости прикрепитe сюда скриншоты
-![Название скриншота](ссылка на скриншот)`
 
----
+
+
+### Задание 4
+
+Создайте свой кастомный дашборд.
+
+1. ![jenkins](/img/33.PNG)
+
+
+
 ## Дополнительные задания (со звездочкой*)
 
 Эти задания дополнительные (не обязательные к выполнению) и никак не повлияют на получение вами зачета по этому домашнему заданию. Вы можете их выполнить, если хотите глубже и/или шире разобраться в материале.
