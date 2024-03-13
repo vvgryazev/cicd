@@ -57,6 +57,7 @@ ALTER USER 'sys_test'@'localhost' IDENTIFIED WITH mysql_native_password BY 'pass
 
 
 
+```bash
 # ssh user@158.160.19.198 -i id_rsa
 $ sudo -i
 # apt update
@@ -86,9 +87,7 @@ mysql> exit
 mysql> SHOW DATABASES;
 mysql> USE sakila;
 mysql> SHOW TABLES;
-
-
----
+```
 
 ### Задание 2
 
