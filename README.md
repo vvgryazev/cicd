@@ -1,4 +1,4 @@
-# Домашнее задание к занятию "Работа с данными" - `Gryazev Vadim`
+# Домашнее задание к занятию "SQL. Часть 1" - `Gryazev Vadim`
 
 
 ### Инструкция по выполнению домашнего задания
@@ -20,88 +20,57 @@
 
 1. [Руководство по оформлению Markdown файлов](https://gist.github.com/Jekins/2bf2d0638163f1294637#Code)
 
+Задание можно выполнить как в любом IDE, так и в командной строке.
 ---
 
 ### Задание 1
 
-1.1. Поднимите чистый инстанс MySQL версии 8.0+. Можно использовать локальный сервер или контейнер Docker.
+Получите уникальные названия районов из таблицы с адресами, которые начинаются на “K” и заканчиваются на “a” и не содержат пробелов.
 
-1.2. Создайте учётную запись sys_temp.
-
-1.3. Выполните запрос на получение списка пользователей в базе данных. (скриншот)
-
-1.4. Дайте все права для пользователя sys_temp.
-
-1.5. Выполните запрос на получение списка прав для пользователя sys_temp. (скриншот)
-
-1.6. Переподключитесь к базе данных от имени sys_temp.
-
-Для смены типа аутентификации с sha2 используйте запрос:
-
-ALTER USER 'sys_test'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
-1.6. По ссылке https://downloads.mysql.com/docs/sakila-db.zip скачайте дамп базы данных.
-
-1.7. Восстановите дамп в базу данных.
-
-1.8. При работе в IDE сформируйте ER-диаграмму получившейся базы данных. При работе в командной строке используйте команду для получения всех таблиц базы данных. (скриншот)
-
-Результатом работы должны быть скриншоты обозначенных заданий, а также простыня со всеми запросами.
-
-1. ![jenkins](/img/100.PNG)
-
-2. ![jenkins](/img/101.PNG)
-
-3. ![jenkins](/img/102.PNG)
-
-4. ![jenkins](/img/103.PNG)
-
-
-
-```bash
-# ssh user@158.160.19.198 -i id_rsa
-$ sudo -i
-# apt update
-# apt install mysql-server mysql-client
-# mysqladmin password -u root -p
-# mysql_secure_installation
-# mysql -u root -p
-mysql> CREATE USER 'sys_test'@'localhost' IDENTIFIED BY 'password';
-mysql> SELECT user,authentication_string,plugin,host FROM mysql.user;
-mysql> GRANT ALL PRIVILEGES ON *.* TO 'sys_test'@'localhost';
-mysql> show grants for 'sys_test'@'localhost';
-mysql> exit
-# mysql -u sys_test -p
-mysql> SELECT user();
-mysql> exit
-# wget https://downloads.mysql.com/docs/sakila-db.zip
-# apt install unzip
-# unzip sakila-db.zip
-# mysql -u sys_test -p
-mysql> CREATE DATABASE `sakila`;
-mysql> SHOW DATABASES;
-mysql> exit
-# export DBNAME=sakila
-# mysql -u sys_test -p ${DBNAME} < /root/sakila-db/sakila-schema.sql
-# mysql -u sys_test -p ${DBNAME} < /root/sakila-db/sakila-data.sql
-# mysql -u sys_test -p
-mysql> SHOW DATABASES;
-mysql> USE sakila;
-mysql> SHOW TABLES;
+#### ОТВЕТ:
+```sql
+SELECT DISTINCT district
+FROM address
+WHERE district LIKE 'K%a' AND district NOT LIKE '% %';
 ```
-
+---
 ### Задание 2
 
-Составьте таблицу, используя любой текстовый редактор или Excel, в которой должно быть два столбца: в первом должны быть названия таблиц восстановленной базы, во втором названия первичных ключей этих таблиц. Пример: (скриншот/текст)
+Получите из таблицы платежей за прокат фильмов информацию по платежам, которые выполнялись в промежуток с 15 июня 2005 года по 18 июня 2005 года **включительно** и стоимость которых превышает 10.00.
 
+#### ОТВЕТ:
+```sql
+SELECT amount, payment_date
+FROM payment
+WHERE CAST(payment_date AS DATE) BETWEEN 20050614 AND 20050618 AND amount > 10.00;
+```
+---
+### Задание 3
 
+Получите последние пять аренд фильмов.
 
+#### ОТВЕТ:
+```sql
+SELECT *
+FROM rental
+ORDER BY rental_id DESC
+LIMIT 5;
+```
+---
+### Задание 4
 
+Одним запросом получите активных покупателей, имена которых Kelly или Willie. 
 
-1. ![jenkins](/img/104.PNG)
+Сформируйте вывод в результат таким образом:
+- все буквы в фамилии и имени из верхнего регистра переведите в нижний регистр,
+- замените буквы 'll' в именах на 'pp'.
 
-
-2. ![jenkins](/img/105.PNG)
-
+#### ОТВЕТ:
+```sql
+SELECT LOWER(REPLACE(first_name, 'LL', 'PP')) AS Имя, LOWER(last_name) AS Фамилия
+FROM customer
+WHERE active = 1 AND (first_name LIKE 'Kelly' OR first_name LIKE 'Willie');
+```
 
 
 
