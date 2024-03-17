@@ -64,22 +64,6 @@ FROM payment
 GROUP BY MONTH(payment_date) 
 ORDER BY COUNT(payment_id)  DESC LIMIT 1 ;
 ```
----
-### Задание 4
-
-Одним запросом получите активных покупателей, имена которых Kelly или Willie. 
-
-Сформируйте вывод в результат таким образом:
-- все буквы в фамилии и имени из верхнего регистра переведите в нижний регистр,
-- замените буквы 'll' в именах на 'pp'.
-
-#### ОТВЕТ:
-```sql
-SELECT LOWER(REPLACE(first_name, 'LL', 'PP')) AS Имя, LOWER(last_name) AS Фамилия
-FROM customer
-WHERE active = 1 AND (first_name LIKE 'Kelly' OR first_name LIKE 'Willie');
-```
-
 
 
 ## Дополнительные задания (со звездочкой*)
