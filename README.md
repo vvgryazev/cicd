@@ -47,13 +47,6 @@ where date(p.payment_date) = '2005-07-30' and p.payment_date = r.rental_date and
 оптимизируйте запрос: внесите корректировки по использованию операторов, при необходимости добавьте индексы.
 
 #### ОТВЕТ:
-explain analyze
-select distinct concat(c.last_name, ' ', c.first_name), sum(p.amount)
-from payment p
-join customer c on c.customer_id = p.customer_id
-where p.payment_date >= '2005-07-30' and p.payment_date < date_add('2005-07-30', INTERVAL 1 DAY)
-group by p.customer_id;
-
 -> Limit: 200 row(s)  (actual time=7.38..7.41 rows=200 loops=1)
     -> Sort with duplicate removal: `concat(c.last_name, ' ', c.first_name)`, `sum(p.amount)`  (actual time=7.38..7.39 rows=200 loops=1)
         -> Table scan on <temporary>  (actual time=7.04..7.11 rows=391 loops=1)
