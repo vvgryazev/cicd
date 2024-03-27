@@ -1,4 +1,4 @@
-# Домашнее задание к занятию "SQL. Часть 2" - `Gryazev Vadim`
+# Домашнее задание к занятию "Индексы" - `Gryazev Vadim`
 
 
 ### Инструкция по выполнению домашнего задания
@@ -25,46 +25,43 @@
 
 ### Задание 1
 
-Одним запросом получите информацию о магазине, в котором обслуживается более 300 покупателей, и выведите в результат следующую информацию:
-
-фамилия и имя сотрудника из этого магазина;
-город нахождения магазина;
-количество пользователей, закреплённых в этом магазине.
+Напишите запрос к учебной базе данных, который вернёт процентное отношение общего размера всех индексов к общему размеру всех таблиц.
 
 #### ОТВЕТ:
-```sql 
-SELECT CONCAT(s2.first_name, ' ', s2.last_name) AS Name, a.address AS Address, COUNT(c.store_id) AS Customers
-FROM store s 
-JOIN customer c ON s.store_id = c.store_id 
-JOIN staff s2 ON s.manager_staff_id = s2.staff_id 
-JOIN address a ON s.address_id = a.address_id 
-GROUP BY c.store_id 
-HAVING COUNT(c.store_id) > 300;
-```
+SELECT table_schema, sum(index_length / data_length) * 100 "Size in %"
+FROM information_schema.TABLES
+GROUP BY table_schema
+HAVING table_schema = "sakila";
+
 ---
 ### Задание 2
 
-Получите количество фильмов, продолжительность которых больше средней продолжительности всех фильмов.
+Выполните explain analyze следующего запроса:
+
+select distinct concat(c.last_name, ' ', c.first_name), sum(p.amount) over (partition by c.customer_id, f.title)
+from payment p, rental r, customer c, inventory i, film f
+where date(p.payment_date) = '2005-07-30' and p.payment_date = r.rental_date and r.customer_id = c.customer_id and i.inventory_id = r.inventory_id
+
+
+перечислите узкие места;
+оптимизируйте запрос: внесите корректировки по использованию операторов, при необходимости добавьте индексы.
 
 #### ОТВЕТ:
-```sql
-SELECT (SELECT  AVG(`length`) from film) AS Average, (SELECT COUNT(1) from film) AS 'All films', COUNT(1) AS 'Long Films'
-FROM film 
-WHERE `length` > (SELECT AVG(`length`) from film) ;
-```
+explain analyze
+select distinct concat(c.last_name, ' ', c.first_name), sum(p.amount)
+from payment p
+join customer c on c.customer_id = p.customer_id
+where p.payment_date >= '2005-07-30' and p.payment_date < date_add('2005-07-30', INTERVAL 1 DAY)
+group by p.customer_id;
+
+-> Limit: 200 row(s)  (actual time=7.38..7.41 rows=200 loops=1)
+    -> Sort with duplicate removal: `concat(c.last_name, ' ', c.first_name)`, `sum(p.amount)`  (actual time=7.38..7.39 rows=200 loops=1)
+        -> Table scan on <temporary>  (actual time=7.04..7.11 rows=391 loops=1)
+            -> Aggregate using temporary table  (actual time=7.04..7.04 rows=391 loops=1)
+                -> Nested loop inner join  (cost=507 rows=634) (actual time=0.0934..6.23 rows=634 loops=1)
+                    -> Index range scan on p using pay_date over ('2005-07-30 00:00:00' <= payment_date < '2005-07-31 00:00:00'), with index condition: ((p.payment_date >= TIMESTAMP'2005-07-30 00:00:00') and (p.payment_date < <cache>(('2005-07-30' + interval 1 day))))  (cost=286 rows=634) (actual time=0.072..4.84 rows=634 loops=1)
+                    -> Single-row index lookup on c using PRIMARY (customer_id=p.customer_id)  (cost=0.25 rows=1) (actual time=0.00191..0.00195 rows=1 loops=634)
 ---
-### Задание 3
-
-Получите информацию, за какой месяц была получена наибольшая сумма платежей, и добавьте информацию по количеству аренд за этот месяц.
-
-#### ОТВЕТ:
-```sql
-SELECT MONTH(payment_date) AS Month, COUNT(payment_id) As Payments, SUM(amount) AS Amount
-FROM payment
-GROUP BY MONTH(payment_date) 
-ORDER BY COUNT(payment_id)  DESC LIMIT 1 ;
-```
-
 
 ## Дополнительные задания (со звездочкой*)
 
