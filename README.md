@@ -47,6 +47,7 @@ where date(p.payment_date) = '2005-07-30' and p.payment_date = r.rental_date and
 оптимизируйте запрос: внесите корректировки по использованию операторов, при необходимости добавьте индексы.
 
 #### ОТВЕТ:
+
 -> Limit: 200 row(s)  (actual time=7.38..7.41 rows=200 loops=1)
     -> Sort with duplicate removal: `concat(c.last_name, ' ', c.first_name)`, `sum(p.amount)`  (actual time=7.38..7.39 rows=200 loops=1)
         -> Table scan on <temporary>  (actual time=7.04..7.11 rows=391 loops=1)
