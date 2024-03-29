@@ -48,14 +48,22 @@ where date(p.payment_date) = '2005-07-30' and p.payment_date = r.rental_date and
 
 #### ОТВЕТ:
 
--> Limit: 200 row(s)  (actual time=7.38..7.41 rows=200 loops=1)
-    -> Sort with duplicate removal: `concat(c.last_name, ' ', c.first_name)`, `sum(p.amount)`  (actual time=7.38..7.39 rows=200 loops=1)
-        -> Table scan on <temporary>  (actual time=7.04..7.11 rows=391 loops=1)
-            -> Aggregate using temporary table  (actual time=7.04..7.04 rows=391 loops=1)
-                -> Nested loop inner join  (cost=507 rows=634) (actual time=0.0934..6.23 rows=634 loops=1)
-                    -> Index range scan on p using pay_date over ('2005-07-30 00:00:00' <= payment_date < '2005-07-31 00:00:00'), with index condition: ((p.payment_date >= TIMESTAMP'2005-07-30 00:00:00') and (p.payment_date < <cache>(('2005-07-30' + interval 1 day))))  (cost=286 rows=634) (actual time=0.072..4.84 rows=634 loops=1)
-                    -> Single-row index lookup on c using PRIMARY (customer_id=p.customer_id)  (cost=0.25 rows=1) (actual time=0.00191..0.00195 rows=1 loops=634)
----
+Узкие места могут быть связаны с использованием функции date() в условии where, что может привести к неэффективному выполнению запроса из-за необходимости вычисления значения функции для каждой строки в таблице. Также, использование функций в условиях соединения таблиц (p.payment_date = r.rental_date) может замедлить выполнение запроса
+
+
+SELECT DISTINCT concat(c.last_name, ' ', c.first_name), sum(p.amount) OVER (PARTITION BY c.customer_id, f.title)
+FROM payment p
+JOIN rental r ON p.payment_date = r.rental_date
+JOIN customer c ON r.customer_id = c.customer_id
+JOIN inventory i ON i.inventory_id = r.inventory_id
+JOIN film f ON i.film_id = f.film_id
+WHERE p.payment_date = '2005-07-30';
+
+
+После оптимизации запроса были использованы операторы JOIN для явного указания связей между таблицами. Также добавлено условие соединения таблицы inventory с таблицей film по полю film_id, чтобы уточнить связь между ними.
+
+Чтобы ускорить выполнение запроса, можно добавить индексы на поля, используемые в условиях соединения и фильтрации. Например, можно добавить индексы на поля payment_date в таблице payment, rental_date в таблице rental, customer_id в таблице customer, inventory_id 
+в таблице inventory, и film_id в таблице film.
 
 ## Дополнительные задания (со звездочкой*)
 
