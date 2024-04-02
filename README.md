@@ -65,6 +65,21 @@ WHERE p.payment_date = '2005-07-30';
 Чтобы ускорить выполнение запроса, можно добавить индексы на поля, используемые в условиях соединения и фильтрации. Например, можно добавить индексы на поля payment_date в таблице payment, rental_date в таблице rental, customer_id в таблице customer, inventory_id 
 в таблице inventory, и film_id в таблице film.
 
+После добавления индекса на поле payment_date и изменения условия WHERE на p.payment_date >= '2005-07-30' AND p.payment_date < '2005-07-31':
+
+
+SELECT DISTINCT CONCAT(c.last_name, ' ', c.first_name), SUM(p.amount) OVER (PARTITION BY c.customer_id, f.title) 
+FROM payment p 
+JOIN rental r ON p.payment_date = r.rental_date 
+JOIN customer c ON r.customer_id = c.customer_id 
+JOIN inventory i ON i.inventory_id = r.inventory_id 
+JOIN film f ON i.film_id = f.film_id 
+WHERE p.payment_date >= '2005-07-30' AND p.payment_date < '2005-07-31';
+
+Таким образом, используется диапазон дат в условии WHERE для более эффективного использования индекса на поле payment_date.
+
+
+
 ## Дополнительные задания (со звездочкой*)
 
 Эти задания дополнительные (не обязательные к выполнению) и никак не повлияют на получение вами зачета по этому домашнему заданию. Вы можете их выполнить, если хотите глубже и/или шире разобраться в материале.
