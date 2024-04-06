@@ -1,4 +1,4 @@
-# Домашнее задание к занятию "Индексы" - `Gryazev Vadim`
+# Домашнее задание к занятию "Уязвимости и атаки на информационные системы" - `Gryazev Vadim`
 
 
 ### Инструкция по выполнению домашнего задания
@@ -25,59 +25,54 @@
 
 ### Задание 1
 
-Напишите запрос к учебной базе данных, который вернёт процентное отношение общего размера всех индексов к общему размеру всех таблиц.
+Скачайте и установите виртуальную машину Metasploitable: https://sourceforge.net/projects/metasploitable/.
+
+Это типовая ОС для экспериментов в области информационной безопасности, с которой следует начать при анализе уязвимостей.
+
+Просканируйте эту виртуальную машину, используя nmap.
+
+Попробуйте найти уязвимости, которым подвержена эта виртуальная машина.
+
+Сами уязвимости можно поискать на сайте https://www.exploit-db.com/.
+
+Для этого нужно в поиске ввести название сетевой службы, обнаруженной на атакуемой машине, и выбрать подходящие по версии уязвимости.
+
+Ответьте на следующие вопросы:
+
+Какие сетевые службы в ней разрешены?
+Какие уязвимости были вами обнаружены? (список со ссылками: достаточно трёх уязвимостей)
+Приведите ответ в свободной форме.
 
 #### ОТВЕТ:
-SELECT table_schema, sum(index_length / data_length) * 100 "Size in %"
-FROM information_schema.TABLES
-GROUP BY table_schema
-HAVING table_schema = "sakila";
+
+nmap -sv -O 192.168.0.11
+
+977 портов закрыты - 23 открыты
+
+Службы - ftp, ssh, telnet, smtp, domain, http, rpcbind, netbios-ssn, exec, login, tcpwrapped, java-rmi, bindshell, nfs, ftp, mysql, postgresql, vnc, X11, irc, ajp13, http
+
+https://www.exploit-db.com/exploits/6122
+https://www.exploit-db.com/exploits/30020
+https://www.exploit-db.com/exploits/27407
 
 ---
 ### Задание 2
 
-Выполните explain analyze следующего запроса:
+Проведите сканирование Metasploitable в режимах SYN, FIN, Xmas, UDP.
 
-select distinct concat(c.last_name, ' ', c.first_name), sum(p.amount) over (partition by c.customer_id, f.title)
-from payment p, rental r, customer c, inventory i, film f
-where date(p.payment_date) = '2005-07-30' and p.payment_date = r.rental_date and r.customer_id = c.customer_id and i.inventory_id = r.inventory_id
+Запишите сеансы сканирования в Wireshark.
 
+Ответьте на следующие вопросы:
 
-перечислите узкие места;
-оптимизируйте запрос: внесите корректировки по использованию операторов, при необходимости добавьте индексы.
+Чем отличаются эти режимы сканирования с точки зрения сетевого трафика?
+Как отвечает сервер?
+Приведите ответ в свободной форме.
 
 #### ОТВЕТ:
 
-Узкие места могут быть связаны с использованием функции date() в условии where, что может привести к неэффективному выполнению запроса из-за необходимости вычисления значения функции для каждой строки в таблице. Также, использование функций в условиях соединения таблиц (p.payment_date = r.rental_date) может замедлить выполнение запроса
+При SYN сканировании не завершается "трёхкратное рукопожатие" , если хост отвечает пакетами с флагом SYN ACK, то порт открыт. FIN сканирование нужно для обхода файерволов. Отправляется пакет с флагом FIN , если хост отвечает RST то порт считается закрытым , соединения без ответа считается открытым . Xmas сканирование посылает пакеты с флагами FIN PSH URG и так же ответ RST говорит о закрытом порте, отстутствие ответа о открытом.
 
-
-SELECT DISTINCT concat(c.last_name, ' ', c.first_name), sum(p.amount) OVER (PARTITION BY c.customer_id, f.title)
-FROM payment p
-JOIN rental r ON p.payment_date = r.rental_date
-JOIN customer c ON r.customer_id = c.customer_id
-JOIN inventory i ON i.inventory_id = r.inventory_id
-JOIN film f ON i.film_id = f.film_id
-WHERE p.payment_date = '2005-07-30';
-
-
-После оптимизации запроса были использованы операторы JOIN для явного указания связей между таблицами. Также добавлено условие соединения таблицы inventory с таблицей film по полю film_id, чтобы уточнить связь между ними.
-
-Чтобы ускорить выполнение запроса, можно добавить индексы на поля, используемые в условиях соединения и фильтрации. Например, можно добавить индексы на поля payment_date в таблице payment, rental_date в таблице rental, customer_id в таблице customer, inventory_id 
-в таблице inventory, и film_id в таблице film.
-
-После добавления индекса на поле payment_date и изменения условия WHERE на p.payment_date >= '2005-07-30' AND p.payment_date < '2005-07-31':
-
-
-SELECT DISTINCT CONCAT(c.last_name, ' ', c.first_name), SUM(p.amount) OVER (PARTITION BY c.customer_id, f.title) 
-FROM payment p 
-JOIN rental r ON p.payment_date = r.rental_date 
-JOIN customer c ON r.customer_id = c.customer_id 
-JOIN inventory i ON i.inventory_id = r.inventory_id 
-JOIN film f ON i.film_id = f.film_id 
-WHERE p.payment_date >= '2005-07-30' AND p.payment_date < '2005-07-31';
-
-Таким образом, используется диапазон дат в условии WHERE для более эффективного использования индекса на поле payment_date.
-
+Ответы хоста можно интерпритировать по флагам
 
 
 ## Дополнительные задания (со звездочкой*)
