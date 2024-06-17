@@ -60,6 +60,33 @@ Cоздайте ВМ, разверните на ней Elasticsearch. Устан
 
 Создайте ВМ, разверните на ней Kibana, сконфигурируйте соединение с Elasticsearch.
 
+![jenkins](/img/210.PNG)
+
+Elasticsearch на ВМ развернут с помощью ansibe ansible/elasticsearch.yaml
+
+Проверка состояния кластера.
+
+![jenkins](/img/211.PNG)
+
+Filebeat на ВМ развернут с помощью ansibe ansible/filebeat.yaml
+
+Проверка доступности elasticsearch.
+
+
+![jenkins](/img/212.PNG)
+![jenkins](/img/213.PNG)
+
+Создайте ВМ, разверните на ней Kibana, сконфигурируйте соединение с Elasticsearch.
+![jenkins](/img/214.PNG)
+
+Kibana на виртуальной машине развернута с использованием ansibe ansible/kibana.yaml
+
+Веб-консоль kibana доступна из сети интернет по адресу http://51.250.28.206:5601
+
+Данные для авторизации: Логин-elastic Пароль-aA48HS5t8dU=PyoPlLch
+
+Логи отправляются в elasticsearch.
+
 ### Сеть
 Разверните один VPC. Сервера web, Elasticsearch поместите в приватные подсети. Сервера Zabbix, Kibana, application load balancer определите в публичную подсеть.
 
