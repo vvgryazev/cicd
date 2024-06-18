@@ -24,35 +24,35 @@
 ### Сайт
 Создайте две ВМ в разных зонах, установите на них сервер nginx, если его там нет. ОС и содержимое ВМ должно быть идентичным, это будут наши веб-сервера.
 
-1. ![jenkins](/img/200.PNG)
+![jenkins](/img/200.PNG)
 
 Создайте [Target Group](https://cloud.yandex.com/docs/application-load-balancer/concepts/target-group), включите в неё две созданных ВМ.
 
-1. ![jenkins](/img/201.PNG)
+![jenkins](/img/201.PNG)
 
 Создайте [Backend Group](https://cloud.yandex.com/docs/application-load-balancer/concepts/backend-group), настройте backends на target group, ранее созданную. Настройте healthcheck на корень (/) и порт 80, протокол HTTP.
 
-1. ![jenkins](/img/202.PNG)
+![jenkins](/img/202.PNG)
 
 Создайте [HTTP router](https://cloud.yandex.com/docs/application-load-balancer/concepts/http-router). Путь укажите — /, backend group — созданную ранее.
 
-1. ![jenkins](/img/203.PNG)
+![jenkins](/img/203.PNG)
 
 Создайте [Application load balancer](https://cloud.yandex.com/en/docs/application-load-balancer/) для распределения трафика на веб-сервера, созданные ранее. Укажите HTTP router, созданный ранее, задайте listener тип auto, порт 80.
 
 
-1. ![jenkins](/img/205.PNG)
+![jenkins](/img/205.PNG)
 
 Протестируйте сайт
 `curl -v <публичный IP балансера>:80` 
 
-1. ![jenkins](/img/2041.png)
+![jenkins](/img/2041.png)
 
 ### Мониторинг
 Создайте ВМ, разверните на ней Zabbix. На каждую ВМ установите Zabbix Agent, настройте агенты на отправление метрик в Zabbix. 
 
 Настройте дешборды с отображением метрик, минимальный набор — по принципу USE (Utilization, Saturation, Errors) для CPU, RAM, диски, сеть, http запросов к веб-серверам. Добавьте необходимые tresholds на соответствующие графики.
-1. ![jenkins](/img/20611.png)
+![jenkins](/img/20611.png)
 
 
 ### Логи
@@ -88,11 +88,10 @@ Kibana на виртуальной машине развернута с испо
 Логи отправляются в elasticsearch.
 
 ### Сеть
-Разверните один VPC. Сервера web, Elasticsearch поместите в приватные подсети. Сервера Zabbix, Kibana, application load balancer определите в публичную подсеть.
+Разверните один VPC. Сервера web, Elasticsearch поместите в приватные подсети. Сервера Zabbix, Kibana, application load balancer определите в публичную подсеть. Настройте Security Groups соответствующих сервисов на входящий трафик только к нужным портам.
 
-Настройте [Security Groups](https://cloud.yandex.com/docs/vpc/concepts/security-groups) соответствующих сервисов на входящий трафик только к нужным портам.
-
-Настройте ВМ с публичным адресом, в которой будет открыт только один порт — ssh.  Эта вм будет реализовывать концепцию  [bastion host]( https://cloud.yandex.ru/docs/tutorials/routing/bastion) . Синоним "bastion host" - "Jump host". Подключение  ansible к серверам web и Elasticsearch через данный bastion host можно сделать с помощью  [ProxyCommand](https://docs.ansible.com/ansible/latest/network/user_guide/network_debug_troubleshooting.html#network-delegate-to-vs-proxycommand) . Допускается установка и запуск ansible непосредственно на bastion host.(Этот вариант легче в настройке)
+![jenkins](/img/230.PNG)
+![jenkins](/img/231.PNG)
 
 ### Резервное копирование
 Создайте snapshot дисков всех ВМ. Ограничьте время жизни snaphot в неделю. Сами snaphot настройте на ежедневное копирование.
